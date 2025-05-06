@@ -1,0 +1,14 @@
+#%RAML 1.0 Trait
+headers:
+    client_id:
+      description: client id
+      type: string
+      required: true
+      pattern: ^[a-zA-Z0-9]{32}$
+      example: c03338a80237413fabcbba9447495af4
+    client_secret:
+      description: client secret
+      type: string
+      required: true
+      pattern: ^[a-zA-Z0-9]{32}$
+      example: d04548a80237413fabckdc9447495af4

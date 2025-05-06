@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd">
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a4d3a8e5-4124-428c-a804-77415c6a152c" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config_property" doc:name="HTTP Listener config" doc:id="ba970cad-e051-41d2-a389-689c61b8e595">
+		<http:listener-connection host="0.0.0.0" port="${deployment.http.listner.port}" />
+	</http:listener-config>
+    
+  <configuration-properties doc:name="Configuration properties" doc:id="41e81b07-6133-4da9-b01d-866e93c9b39e" file="config/common-properties.yaml" />
+  <configuration-properties doc:name="Configuration properties" doc:id="071d47e7-c44c-407c-8d43-159f3c3ef005" file="config/${env}-properties.yaml" />
+  
+	<global-property doc:name="Global Property" doc:id="9da7bd35-42b2-4514-8066-13924b89d7dd" name="env" value="dev" />
+	<global-property doc:name="Global Property" doc:id="9ea06c3b-cda7-4c2e-ab1f-2da3cd4f9463" name="encrypt.key" value="abc" />
+	
+	<http:request-config name="HTTP_Req_Config_salesforce-sapi" doc:name="HTTP Request configuration" doc:id="6ce21dc0-fc1c-4d98-9743-fc79ac7785af" basePath="/api/" >
+		<http:request-connection host="${app.sfSapi.host}" port="${app.sfSapi.port}" protocol="HTTPS"/>
+	</http:request-config>
+	
+<!-- 	<cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="27702c8b-85d7-47b7-a08a-7035579ee8dd" >
+		<cloudhub:oauth-client-credentials-connection clientId="${secure::chNotification.clientId}" clientSecret="${secure::chNotification.clientSecret}" environment="${secure::chNotification.envId}" />
+	</cloudhub:config>
+-->
 	<cloudhub:config name="CloudHub_Config" doc:name="CloudHub Config" doc:id="45156e6f-a976-4005-a8ed-a22635273350" >
 		<cloudhub:oauth-client-credentials-connection clientId="abc7f7bc987249ffa2cc3a12432b5501--ClientId From ConnectedApp" clientSecret="fE6abc462bf441199261e11df1808a05-ClientSecret from ConnectedApp" environment="b64afde6-61d2-3232-a91e-0b1084384ed6 - Env Id from API Manager" />
 	</cloudhub:config>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="cec4d1ab-2213-4578-ad87-acc2d36603b0" file="config/${env}-secure-properties.yaml" key="${encrypt.key}">
+        <secure-properties:encrypt algorithm="Blowfish" />
+    </secure-properties:config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="7858d290-34b5-4b19-bd94-0b3ac4ae14ef" >
+		<salesforce:jwt-connection consumerKey="&lt;clientId&gt;" keyStore="cert/sit-cert.jks" storePassword="&lt;KeyPassword&gt;" principal="&lt;IntegrationUserId&gt;" certificateAlias="&lt;Alias?" audienceUrl="https://test.salesforce.com" tokenEndpoint="https://&lt;SF Domain&gt;/services/oauth2/token"/>
+	</salesforce:sfdc-config>
 </mule>

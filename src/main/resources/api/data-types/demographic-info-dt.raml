@@ -1,0 +1,56 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+  accountRecordId:
+    type: string
+  contactRecordId:
+    type: string
+  aNumber:
+    type: string
+    required: false
+  lastName:
+    type: string
+  firstName:
+    type: string
+    required: false
+  middleName:
+    type: string
+    required: false
+  sex:
+    type: string|nil
+    required: false
+    enum: ['Male', 'Female', 'Not Available', ~ ]
+  birthDate:
+    type: date-only
+    required: false
+  emailAddress:
+    type: string
+    required: false
+  bannerAddressType:
+    type: string
+    required: false
+  street:
+    type: string
+    required: false
+  city: 
+    type: string
+    required: false
+  stateCode:
+    type: string
+    required: false
+  postalCode:
+    type: string
+    required: false
+  country:
+    type: string
+    required: false
+  countryCode:
+    type: string
+    required: false
+  phoneType:
+    type: string
+    required: false
+  phoneNumber:
+    type: string
+    required: false
+  

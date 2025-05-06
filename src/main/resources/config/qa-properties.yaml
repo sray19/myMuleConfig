@@ -1,0 +1,11 @@
+#Environment Specific Properties:  ~~~ qa Properties ~~~
+
+api:
+  id: "xxss"
+  
+deployment:
+  workers: "1"
+  workerType: "MICRO"
+  http:
+    listner:
+      port: "8081"

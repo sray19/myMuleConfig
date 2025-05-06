@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:slack="http://www.mulesoft.org/schema/mule/slack" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/slack http://www.mulesoft.org/schema/mule/slack/current/mule-slack.xsd">
+	<flow name="sf-banner-pe-flowFlow" doc:id="c975efa7-8393-4513-8918-48b459eafb53" >
+		<salesforce:subscribe-channel-listener doc:name="Subscribe channel listener" doc:id="986fec7a-8a6e-45c9-89ef-8d8b9b35bc7a" config-ref="Salesforce_Config" streamingChannel="/event/Admissions_Decision_Created__e"/>
+		<set-payload value='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;  "data": {&#10;    "schema": "m-tk0srnGaWHWbsAoJDpNw",&#10;    "payload": {&#10;      "CreatedById": "005Dz5454dZJjIAM",&#10;      "CreatedDate": "2025-05-01T14:27:44.354Z",&#10;      "Application_Id__c": "0iTDz3545CaR7MAK",&#10;      "Application_Decision__c": "AD",&#10;      "Person_Account_ID__c": "001Dz3433jJCshIAG1",&#10;      "Decision_Id__c": "0vwDz0544CkYIAU"&#10;    },&#10;    "event": {&#10;      "EventUuid": "3827ebd6-83d4-454f-902a-1671f22caa10",&#10;      "replayId": 1018038,&#10;      "EventApiName": "Event_Name_Decision_Created__e"&#10;    }&#10;  },&#10;  "channel": "/event/Event_Name_Decision_Created__e"&#10;}]' doc:name="mock XXXXX" doc:id="cff3db26-f8e6-4674-98e8-a2cde73bd913" />
+		<set-variable value="#[payload.data.payload]" doc:name="origPayload" doc:id="fd08f4c4-b453-4ccc-8876-d3756e1204a8" variableName="usefullPayload"/>
+		<ee:transform doc:name="update individualApplication" doc:id="b522eb16-29b6-46b0-8c6d-f8269938275b">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+[
+    {
+        
+        "indvAppId": vars.applicationId,
+        "bannerStatus": vars.personMatchStatus,
+        "bannerGuid": payload.id
+    }
+]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+		
+		
+	</flow>
+	<sub-flow name="sf-resp-validation" doc:id="a1c20c7a-c801-4a9d-ac8a-ccd7359a197b" >
+		<ee:transform doc:name="Transform Message" doc:id="9e5d84fa-5d2c-4c44-b3fe-c0fa5970b18d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+  "accountRecordId": "001Dz00002jJCshIAG",
+  "contactRecordId": "003Dz00002NO3qiIAD",
+  "aNumber": "test21",
+  "firstName": "Arewdateljan",
+  "lastName": "pauejddigojan",
+  "middleName": null,
+  "sex": "Female",
+  "birthDate": "1959-09-23",
+  "emailAddress": "mdddipdatel1124@ssusu.edu",
+  "bannerAddressType": null,
+  
+  "street": "66642 dki dipkdol St Ave",
+  "city": "wethersfield",
+  "stateCode": "US-GA",
+  "postalCode": "84340",
+  "country": "United States",
+  
+  "phoneType": null,
+  "phoneNumber": "1262382000"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<validation:is-not-null doc:name="Is not null: lastName" doc:id="036efeef-edd4-48bb-bb00-91fc9cf5619a" value="#[payload.lastName]" message="lastName not on salesforce response" />
+		<validation:is-not-null doc:name="Is not null: firstName" doc:id="a5cd824f-1290-4750-b977-12fe2835756b" value="#[payload.firstName]" message="firstName not on salesforce response" />
+		<validation:any doc:name="Any" doc:id="9f5e15cb-0f0b-4d94-9d05-a6665a3b42bb" >
+			<validation:is-not-null doc:name="Is not null: birthDate" doc:id="8dc10e7b-44e7-43e0-92fe-fbcf7f1d1516" value="#[payload.birthDate]" message="birthDate not on salesforce response" />
+			<validation:all doc:name="All" doc:id="94294fb2-8bb8-4eb6-acaa-fa2e88fec0e7" >
+				<validation:is-not-null doc:id="444658da-763c-4609-8485-484484c663c0" doc:name="Is not null: street" value="#[payload.street]" message="street not on salesforce response"/>
+				<validation:is-not-null doc:id="42fb67f1-98cd-4966-9a21-a14440966e45" value="#[payload.city]" message="city not on salesforce response" doc:name="Is not null: city" />
+				<validation:is-not-null doc:name="Is not null: stateCode" doc:id="723208f5-f20e-454b-a122-5df0a5c55b0c" value="#[payload.stateCode]" message="stateCode not on salesforce response" />
+				<validation:is-not-null doc:name="Is not null: postalCode" doc:id="145ed915-5232-4475-b484-a48fadf9fac9" value="#[payload.postalCode]" message="postalCode not on salesforce response" />
+				<validation:is-not-null doc:name="Is not null: countryCode" doc:id="e9a8f7b8-b110-472c-9721-f1f840d5d23a" value="#[payload.countryCode]" message="countryCode not on salesforce response" />
+		</validation:all>
+		</validation:any>
+		<ee:transform doc:name="Transform Message" doc:id="0ae3d728-5dd4-48d7-a40c-ab835d2dd219" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"Validation Successfull"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6dcd6643-ed8b-40f3-88fe-df027e791a70" />
+	</sub-flow>
+</mule>

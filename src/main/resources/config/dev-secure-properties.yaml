@@ -1,0 +1,16 @@
+#Dev Secure App Properties
+        
+https:
+  keyPass: "![LMwU9lU49ETVhX81ziCo4w==]"
+
+app:
+  sfSapi:
+    clientId: "![vw89Zb/dfdffd==]"
+    clientSecret: "![fddffd/+b/EPaeXTNBp6qsYOiydmUsXWUZTRxkgA==]"
+  bannerApi:
+    token: "![fddddfd+tyy+w==]"
+    
+chNotification:
+  clientId: "![df==]"
+  clientSecret: "![df+f/df==]"
+  envId: "![fd/fdf==]"

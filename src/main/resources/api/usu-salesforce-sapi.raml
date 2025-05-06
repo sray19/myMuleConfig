@@ -1,0 +1,100 @@
+#%RAML 1.0
+title: usu-salesforce-sapi
+description: This api is used to query existing Records in from salesforce and also used to create records in Salesforce.
+version: v1
+mediaType: application/json
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/61f00777-7ea9-497a-b8ad-833bafb83b64
+
+traits:
+  correlation-id: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/common/correlation-id-trait.raml
+  client-id-required: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/common/client-id-trait.raml
+  success-200: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/200-trait.raml
+  success-201: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/201-trait.raml
+  
+  fault-400: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/400-trait.raml
+  fault-401: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/401-trait.raml
+  fault-404: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/404-trait.raml
+  fault-405: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/405-trait.raml
+  fault-406: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/406-trait.raml
+  fault-415: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/415-trait.raml
+  fault-500: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/500-trait.raml
+  fault-501: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/501-trait.raml
+  healthCheck-200: !include ./exchange_modules/df8f9927-a3b8-468b-af25-2fe27ae4a835/common-raml-fragments/1.0.0/traits/json/200-trait.raml
+
+resourceTypes:
+  health-check:
+    usage: Use this resource to check health of Mulesoft application
+    description: Entity representing a Mulesoft application health check
+    get:
+      description: Get health of an application
+      is: [correlation-id, client-id-required, healthCheck-200, fault-400, fault-401, fault-404, fault-405, fault-406, fault-415, fault-500, fault-501]
+
+types:
+  acctDemographic: !include ./data-types/demographic-info-dt.raml
+  contactUpdate: !include ./data-types/contact-update-dt.raml
+  indvAppUpdate: !include ./data-types/individual-application-update-dt.raml
+  500-resp: !include ./data-types/error-resp-dt.raml
+/healthCheck:
+  type: 
+    health-check:
+      
+/account:
+  /demographic:
+    get:
+      is: 
+        - client-id-required
+        - fault-500
+        - fault-404
+      queryParameters:
+        accountId:
+          type: string
+          description: account id on which the demographic needs to be pulled from SF.
+          required: true
+      responses:
+        200:
+          body:
+            application/json:
+              type: acctDemographic
+              example: !include /examples/demographic-info-example.raml
+
+/contact:
+  patch:
+    description: This api is used to update fields on the Contact object
+    is:
+      - client-id-required
+      - fault-500
+      - fault-404
+    body:
+      application/json:
+        type: contactUpdate
+        example: !include /examples/contact-update-example.raml
+        
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include /examples/contact-update-resp-example.raml
+
+/indv-appl:
+  patch:
+    description: This api is used to update fields on the IndividualApplication object
+    is:
+      - client-id-required
+      - fault-500
+      - fault-404
+    body:
+      application/json:
+        type: indvAppUpdate
+        example: !include /examples/individual-application-update-example.raml
+        
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include /examples/individual-application-update-resp-example.raml
+
+              
+
+  
+      
+        
